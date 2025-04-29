@@ -1,5 +1,4 @@
-import type { OnInit } from '@angular/core';
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnChanges, Input, Output, EventEmitter, ViewChild, ElementRef, SimpleChanges } from '@angular/core';
 
 import { TranslateService } from '@ngx-translate/core';
 
@@ -19,7 +18,9 @@ import { SettingsMetaGroup, SettingsMetaGroupLabels } from '../../common/setting
     './settings.component.scss'
   ]
 })
-export class SettingsComponent implements OnInit {
+export class SettingsComponent implements OnInit, AfterViewInit, OnChanges {
+
+  @ViewChild('settingsContainer') settingsContainer!: ElementRef<HTMLDivElement>;
 
   @Output() changeLanguage = new EventEmitter<string>();
   @Output() checkForNewVersion = new EventEmitter<any>();
@@ -52,6 +53,25 @@ export class SettingsComponent implements OnInit {
 
   ngOnInit(): void {
     this.additionalInput = this.appState.addtionalExtensions;
+  }
+
+  ngAfterViewInit(): void {
+    this.scrollToTop();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['settingTabToShow'] && !changes['settingTabToShow'].firstChange) {
+      this.scrollToTop();
+    }
+  }
+
+  private scrollToTop(): void {
+    setTimeout(() => {
+      if (this.settingsContainer?.nativeElement) {
+        this.settingsContainer.nativeElement.scrollTop = 0;
+        console.log('Scrolled to top!');
+      }
+    }, 0);
   }
 
   editAdditionalExtensions() {
